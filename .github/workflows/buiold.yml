@@ -1,14 +1,10 @@
-name: Build Flet App
+name: Build Flet App (Android)
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ main, master ]
   pull_request:
-    branches:
-      - main
-      - master
+    branches: [ main, master ]
   workflow_dispatch:
 
 env:
@@ -22,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -40,16 +36,11 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
-      - name: Install Java (for Android build)
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Install Android SDK packages
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-33" "build-tools;34.0.0"
+          distribution: temurin
+          java-version: 17
 
       - name: Build APK
         run: |
@@ -57,7 +48,7 @@ jobs:
           python -m pip install --upgrade flet
           flet build apk --verbose --build-number=${{ env.BUILD_NUMBER }} --build-version=${{ env.BUILD_VERSION }}
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: apk-artifact
